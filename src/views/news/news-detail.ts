@@ -1,7 +1,7 @@
 import { News } from '../../news/news.service';
-import { Comment } from 'src/news/comments/comments.service';
+import { CreateCommentDto } from 'src/news/comments/dtos/create-comments-dto';
 
-export function renderNewsDetails(news: News, comments: Comment[]) {
+export function renderNewsDetails(news: News, comments: CreateCommentDto[]) {
   const newsHtml = renderNewsBlock(news);
   let commentsListHtml = '';
   if (comments) {
@@ -41,11 +41,16 @@ function renderNewsBlock(news: News) {
   `;
 }
 
-function renderCommentsBlock(comment: Comment) {
+function renderCommentsBlock(comment: CreateCommentDto) {
   return `
   <div class="m-2">
-    <div class="card" style="width: 200px;">
+    <div class="card">
       <div class="card-body">
+        ${
+          comment?.avatar
+            ? `<img src="${comment.avatar}" style="background: #ccc; width: 75px; height: 75px; object-fit: cover;"/>`
+            : '<div style="background: #ccc; width: 75px; height: 75px;" class="rounded-lg"></div>'
+        }
         <h5 class="card-title">${comment.id}</h5>
         <h6 class="card-subtitle mb-2 text-muted">${comment.author}</h6>
         <p class="card-text">${comment.message}</p>

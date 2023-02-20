@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { getRandomInt } from '../news.service';
+import { CreateCommentDto } from './dtos/create-comments-dto';
 
 export type Comment = {
   id?: number;
@@ -21,10 +22,10 @@ export class CommentsService {
       this.comments[idNews] = [];
     }
     this.comments[idNews].push({ ...comment, id: getRandomInt() });
-    return 'Комментарий создан';
+    return this.comments[idNews];
   }
 
-  find(idNews: number): Comment[] | null {
+  find(idNews: number): CreateCommentDto[] | null {
     return this.comments[idNews] || null;
   }
 
