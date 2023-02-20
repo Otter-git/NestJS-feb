@@ -4,8 +4,10 @@ import { Comment } from 'src/news/comments/comments.service';
 export function renderNewsDetails(news: News, comments: Comment[]) {
   const newsHtml = renderNewsBlock(news);
   let commentsListHtml = '';
-  for (const comment of comments) {
-    commentsListHtml += renderCommentsBlock(comment);
+  if (comments) {
+    for (const comment of comments) {
+      commentsListHtml += renderCommentsBlock(comment);
+    }
   }
   return `
     <h1>Подробности</h1>
