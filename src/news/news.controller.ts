@@ -9,10 +9,11 @@ import {
   UploadedFile,
   HttpException,
   HttpStatus,
+  Render,
 } from '@nestjs/common';
 import { CommentsService } from './comments/comments.service';
 import { News, NewsService } from './news.service';
-import { renderNewsAll } from 'src/views/news/news-all';
+// import { renderNewsAll } from 'src/views/news/news-all';
 import { renderTemplate } from 'src/views/template';
 import { renderNewsDetails } from '../views/news/news-detail';
 import { CreateNewsDto } from './dtos/create-news-dto';
@@ -20,6 +21,7 @@ import { EditNewsDto } from './dtos/edit-news-dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { HelperFileLoader } from 'src/utils/helper-file-loader';
+import { MailService } from '../mail/mail.service';
 
 const PATH_NEWS = '/news-static/';
 HelperFileLoader.path = PATH_NEWS;
@@ -29,6 +31,7 @@ export class NewsController {
   constructor(
     private readonly newsService: NewsService,
     private readonly commentsService: CommentsService,
+    private readonly mailService: MailService,
   ) {}
 
   @Get('/api/detail/:id')
@@ -49,13 +52,21 @@ export class NewsController {
   }
 
   @Get('/all')
+  @Render('news-list')
   getAllView() {
     const news = this.newsService.getAll();
-    const content = renderNewsAll(news);
-    return renderTemplate(content, {
-      title: 'Список новостей',
-      description: 'Коты',
-    });
+    // const content = renderNewsAll(news);
+    // return renderTemplate(content, {
+    //   title: 'Список новостей',
+    //   description: 'Коты',
+    // });
+    return { news, title: 'Список новостей' };
+  }
+
+  @Get('create/new')
+  @Render('create-news')
+  async createView() {
+    return {};
   }
 
   @Get('/:id/detail')
@@ -79,10 +90,10 @@ export class NewsController {
       }),
     }),
   )
-  create(
+  async create(
     @Body() news: CreateNewsDto,
-    @UploadedFile() cover: Express.Multer.File,
-  ): News {
+    @UploadedFile() cover,
+  ): Promise<News> {
     const fileExtension = cover.originalname.split('.').reverse()[0];
     if (!fileExtension || !fileExtension.match(/(jpg|jpeg|png|gif)$/)) {
       throw new HttpException(
@@ -97,7 +108,12 @@ export class NewsController {
       news.cover = PATH_NEWS + cover.filename;
     }
 
-    return this.newsService.create(news);
+    const createdNews = this.newsService.create(news);
+    await this.mailService.sendNewNewsForAdmins(
+      ['otterjs.gb@gmail.com'],
+      createdNews,
+    );
+    return createdNews;
   }
 
   @Post('/api/:id')

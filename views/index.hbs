@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>App</title>
+  </head>
+  <body>
+    <ul>
+        {{#each messages}}
+            <li>
+                {{#if this.author}}
+                    {{this.author}}
+                {{else}}
+                    Имени нет
+                {{/if}}
+                <h6>{{this.message}}</h6>
+            </li>
+        {{/each}}
+    </ul>
+  </body>
+</html>

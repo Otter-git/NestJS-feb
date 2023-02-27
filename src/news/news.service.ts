@@ -33,8 +33,7 @@ export class NewsService {
       description: 'Hurray',
       author: 'frog',
       countView: 12,
-      cover:
-        'https://upload.wikimedia.org/wikipedia/commons/thumb/7/76/Jasmina.JPG/1200px-Jasmina.JPG',
+      cover: '/news-static/f97dd700-3413-406f-9d31-6ec77a553cca.jpeg',
     },
   ];
 

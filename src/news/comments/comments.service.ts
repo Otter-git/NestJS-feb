@@ -17,7 +17,7 @@ export type CommentEdit = {
 export class CommentsService {
   private readonly comments = {};
 
-  create(idNews: number, comment: Comment) {
+  create(idNews: number, comment: CreateCommentDto) {
     if (!this.comments[idNews]) {
       this.comments[idNews] = [];
     }

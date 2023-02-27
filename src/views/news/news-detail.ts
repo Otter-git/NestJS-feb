@@ -27,7 +27,7 @@ function renderNewsBlock(news: News) {
     <div class="card">
       ${
         news.cover
-          ? `<img class="card-img-top" src="${news.cover}" alt="...">`
+          ? `<img class="card-img-top" src="http://localhost:3000/${news.cover}" alt="...">`
           : ''
       }
       <div class="card-body">
@@ -48,7 +48,7 @@ function renderCommentsBlock(comment: CreateCommentDto) {
       <div class="card-body">
         ${
           comment?.avatar
-            ? `<img src="${comment.avatar}" style="background: #ccc; width: 75px; height: 75px; object-fit: cover;"/>`
+            ? `<img src="http://localhost:3000/${comment.avatar}" style="background: #ccc; width: 75px; height: 75px; object-fit: cover;"/>`
             : '<div style="background: #ccc; width: 75px; height: 75px;" class="rounded-lg"></div>'
         }
         <h5 class="card-title">${comment.id}</h5>
