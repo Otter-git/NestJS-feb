@@ -13,9 +13,6 @@ import {
 } from '@nestjs/common';
 import { CommentsService } from './comments/comments.service';
 import { News, NewsService } from './news.service';
-// import { renderNewsAll } from 'src/views/news/news-all';
-import { renderTemplate } from 'src/views/template';
-import { renderNewsDetails } from '../views/news/news-detail';
 import { CreateNewsDto } from './dtos/create-news-dto';
 import { EditNewsDto } from './dtos/edit-news-dto';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -55,11 +52,6 @@ export class NewsController {
   @Render('news-list')
   getAllView() {
     const news = this.newsService.getAll();
-    // const content = renderNewsAll(news);
-    // return renderTemplate(content, {
-    //   title: 'Список новостей',
-    //   description: 'Коты',
-    // });
     return { news, title: 'Список новостей' };
   }
 
@@ -69,16 +61,22 @@ export class NewsController {
     return {};
   }
 
+  @Get('edit/:id')
+  @Render('edit-news')
+  async editView() {
+    return {};
+  }
+
   @Get('/:id/detail')
+  @Render('news-detail')
   getDetails(@Param('id') id: string) {
     const idInt = parseInt(id);
     const news = this.newsService.find(idInt);
     const comments = this.commentsService.find(idInt);
-    const content = renderNewsDetails(news, comments);
-    return renderTemplate(content, {
-      title: `Новость ${idInt}`,
-      description: `${news.description}`,
-    });
+    return {
+      news,
+      comments,
+    };
   }
 
   @Post('/api')
@@ -117,9 +115,37 @@ export class NewsController {
   }
 
   @Post('/api/:id')
-  edit(@Param('id') id: string, @Body() news: EditNewsDto): News {
+  @UseInterceptors(
+    FileInterceptor('cover', {
+      storage: diskStorage({
+        destination: HelperFileLoader.destinationPath,
+        filename: HelperFileLoader.customFileName,
+      }),
+    }),
+  )
+  async edit(
+    @Param('id') id: string,
+    @Body() news: EditNewsDto,
+    @UploadedFile() cover,
+  ): Promise<News> {
+    if (cover) {
+      const fileExtension = cover.originalname.split('.').reverse()[0];
+      if (!fileExtension || !fileExtension.match(/(jpg|jpeg|png|gif)$/)) {
+        throw new HttpException(
+          {
+            status: HttpStatus.INTERNAL_SERVER_ERROR,
+            error: 'Неверный тип файла',
+          },
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+    }
+    if (cover?.filename) {
+      news.cover = PATH_NEWS + cover.filename;
+    }
     const idInt = parseInt(id);
-    return this.newsService.edit(idInt, news);
+    const editedNews = this.newsService.edit(idInt, news);
+    return editedNews;
   }
 
   @Delete('/api/:id')
