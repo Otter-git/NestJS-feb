@@ -10,11 +10,7 @@ export class CreateNewsDto {
   description: string;
 
   @IsNotEmpty()
-  @IsString()
-  author: string;
-
-  @ValidateIf((o) => o.countView !== undefined)
-  countView: number;
+  userId: string;
 
   @ValidateIf((o) => o.cover !== undefined)
   cover: string;
