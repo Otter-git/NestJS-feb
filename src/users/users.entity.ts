@@ -1,3 +1,4 @@
+import { CommentsEntity } from 'src/news/comments/comments.entity';
 import {
   Column,
   CreateDateColumn,
@@ -18,6 +19,9 @@ export class UsersEntity {
 
   @OneToMany(() => NewsEntity, (news) => news.user)
   news: NewsEntity[];
+
+  @OneToMany(() => CommentsEntity, (comments) => comments.user)
+  comments: CommentsEntity[];
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;

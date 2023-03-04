@@ -85,7 +85,7 @@ export class NewsController {
         HttpStatus.NOT_FOUND,
       );
     }
-    const comments = this.commentsService.find(id);
+    const comments = this.commentsService.findAll(id);
     return {
       news,
       comments,
@@ -152,7 +152,7 @@ export class NewsController {
     if (cover?.filename) {
       news.cover = PATH_NEWS + cover.filename;
     }
-    const editedNews = this.newsService.edit(id, news);
+    const editedNews = await this.newsService.edit(id, news);
     if (!editedNews) {
       throw new HttpException(
         {

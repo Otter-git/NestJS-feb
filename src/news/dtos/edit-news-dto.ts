@@ -1,4 +1,4 @@
-import { IsNumber, IsString, ValidateIf } from 'class-validator';
+import { IsString, ValidateIf } from 'class-validator';
 
 export class EditNewsDto {
   @ValidateIf((o) => o.title !== undefined)

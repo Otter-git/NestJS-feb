@@ -45,17 +45,16 @@ export class NewsService {
   findById(id: News['id']): Promise<NewsEntity> {
     return this.newsRepository.findOne({
       where: { id: id },
-      relations: ['user'],
+      relations: ['user', 'comments', 'comments.user'],
     });
   }
 
   async edit(id: number, news: NewsEdit): Promise<NewsEntity | null> {
     const editableNews = await this.findById(id);
     if (editableNews) {
-      const newsEntity = new NewsEntity();
-      newsEntity.description = news.description || editableNews.description;
-      newsEntity.title = news.title || editableNews.title;
-      newsEntity.cover = news.cover || editableNews.cover;
+      editableNews.description = news.description || editableNews.description;
+      editableNews.title = news.title || editableNews.title;
+      editableNews.cover = news.cover || editableNews.cover;
 
       return this.newsRepository.save(editableNews);
     }

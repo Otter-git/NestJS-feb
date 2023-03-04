@@ -5,14 +5,11 @@ import {
   Body,
   Get,
   Delete,
-  UseInterceptors,
-  UploadedFile,
+  ParseIntPipe,
+  Put,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
 import { HelperFileLoader } from 'src/utils/helper-file-loader';
 import { CommentsService } from './comments.service';
-import { Comment } from './comments.service';
 import { CreateCommentDto } from './dtos/create-comments-dto';
 import { EditCommentDto } from './dtos/edit-comments-dto';
 
@@ -24,50 +21,28 @@ export class CommentsController {
   constructor(private readonly commentsService: CommentsService) {}
 
   @Post('/api/:idNews')
-  @UseInterceptors(
-    FileInterceptor('avatar', {
-      storage: diskStorage({
-        destination: HelperFileLoader.destinationPath,
-        filename: HelperFileLoader.customFileName,
-      }),
-    }),
-  )
   create(
-    @Param('idNews') idNews: string,
+    @Param('idNews', ParseIntPipe) idNews: number,
     @Body() comment: CreateCommentDto,
-    @UploadedFile() avatar: Express.Multer.File,
   ) {
-    if (avatar?.filename) {
-      comment.avatar = PATH_NEWS + avatar.filename;
-    }
-    const idNewsInt = parseInt(idNews);
-    return this.commentsService.create(idNewsInt, comment);
+    return this.commentsService.create(idNews, comment);
   }
 
-  @Post('/api/:idNews/:idComment')
+  @Put('/api/:idComment')
   edit(
-    @Param('idNews') idNews: string,
-    @Param('idComment') idComment: string,
+    @Param('idComment', ParseIntPipe) idComment: number,
     @Body() comment: EditCommentDto,
-  ): Comment {
-    const idNewsInt = parseInt(idNews);
-    const idCommentInt = parseInt(idComment);
-    return this.commentsService.edit(idNewsInt, idCommentInt, comment);
+  ) {
+    return this.commentsService.edit(idComment, comment);
   }
 
   @Get('/api/:idNews')
-  get(@Param('idNews') idNews: string) {
-    const idNewsInt = parseInt(idNews);
-    return this.commentsService.find(idNewsInt);
+  get(@Param('idNews', ParseIntPipe) idNews: number) {
+    return this.commentsService.findAll(idNews);
   }
 
-  @Delete('/api/:idNews/:idComment')
-  remove(
-    @Param('idNews') idNews: string,
-    @Param('idComment') idComment: string,
-  ) {
-    const idNewsInt = parseInt(idNews);
-    const idCommentInt = parseInt(idComment);
-    return this.commentsService.remove(idNewsInt, idCommentInt);
+  @Delete('/api/:idComment')
+  remove(@Param('idComment', ParseIntPipe) idComment: number) {
+    return this.commentsService.remove(idComment);
   }
 }

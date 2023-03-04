@@ -5,9 +5,4 @@ export class EditCommentDto {
   @IsString()
   @IsNotEmpty()
   message: string;
-
-  @ValidateIf((o) => o.author !== undefined)
-  @IsString()
-  @IsNotEmpty()
-  author: string;
 }
