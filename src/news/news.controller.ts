@@ -11,6 +11,7 @@ import {
   HttpStatus,
   Render,
   ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { CommentsService } from './comments/comments.service';
 import { NewsService } from './news.service';
@@ -21,6 +22,9 @@ import { diskStorage } from 'multer';
 import { HelperFileLoader } from 'src/utils/helper-file-loader';
 import { MailService } from '../mail/mail.service';
 import { NewsEntity } from './news.entity';
+import { Roles } from 'src/auth/role/roles.decorator';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { Role } from 'src/auth/role/role.enum';
 
 const PATH_NEWS = '/news-static/';
 HelperFileLoader.path = PATH_NEWS;
@@ -90,8 +94,11 @@ export class NewsController {
       news,
       comments,
     };
+    // return news;
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Roles(Role.Admin, Role.Moderator)
   @Post('/api')
   @UseInterceptors(
     FileInterceptor('cover', {
@@ -106,7 +113,7 @@ export class NewsController {
     @UploadedFile() cover,
   ): Promise<NewsEntity> {
     const fileExtension = cover.originalname.split('.').reverse()[0];
-    if (!fileExtension || !fileExtension.match(/(jpg|jpeg|png|gif)$/)) {
+    if (!fileExtension || !fileExtension.match(/(jpg|jpeg|png|gif)$/i)) {
       throw new HttpException(
         {
           status: HttpStatus.INTERNAL_SERVER_ERROR,
