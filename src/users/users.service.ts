@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Role } from 'src/auth/role/role.enum';
 import { checkPermission, Modules } from 'src/auth/role/utils/check-permission';
 import { hash } from 'src/utils/crypto';
 import { Repository } from 'typeorm';
@@ -18,7 +19,7 @@ export class UsersService {
     const usersEntity = new UsersEntity();
     usersEntity.firstName = user.firstName;
     usersEntity.email = user.email;
-    usersEntity.roles = user.roles;
+    usersEntity.roles = Role.User;
     usersEntity.password = await hash(user.password);
 
     return this.usersRepository.save(usersEntity);
@@ -47,7 +48,7 @@ export class UsersService {
     return this.usersRepository.save(_user);
   }
 
-  async findById(id: number) {
+  async findById(id: number): Promise<UsersEntity> {
     return this.usersRepository.findOneBy({ id });
   }
 

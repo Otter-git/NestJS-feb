@@ -5,14 +5,17 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { CommentsEntity } from './comments.entity';
 import { NewsModule } from '../news.module';
 import { UsersModule } from 'src/users/users.module';
+import { SocketCommentsGateway } from './socket-comments.gateway';
+import { AuthModule } from '../../auth/auth.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([CommentsEntity]),
     forwardRef(() => NewsModule),
     UsersModule,
+    AuthModule,
   ],
-  providers: [CommentsService],
+  providers: [CommentsService, SocketCommentsGateway],
   controllers: [CommentsController],
   exports: [CommentsService, TypeOrmModule.forFeature([CommentsEntity])],
 })

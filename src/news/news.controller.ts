@@ -89,12 +89,7 @@ export class NewsController {
         HttpStatus.NOT_FOUND,
       );
     }
-    const comments = this.commentsService.findAll(id);
-    return {
-      news,
-      comments,
-    };
-    // return news;
+    return { news };
   }
 
   @UseGuards(JwtAuthGuard)
