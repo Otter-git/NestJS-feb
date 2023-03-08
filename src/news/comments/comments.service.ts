@@ -5,6 +5,11 @@ import { Repository } from 'typeorm';
 import { NewsService } from '../news.service';
 import { CommentsEntity } from './comments.entity';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { EventsComment } from './EventComment.enum';
+import {
+  checkPermission,
+  Modules,
+} from '../../auth/role/utils/check-permission';
 
 export type Comment = {
   id?: number;
@@ -26,7 +31,6 @@ export class CommentsService {
     private readonly usersService: UsersService,
     private readonly eventEmitter: EventEmitter2,
   ) {}
-  private readonly comments = {};
 
   async create(
     idNews: number,
@@ -72,15 +76,24 @@ export class CommentsService {
   }
 
   async edit(idComment: number, comment: CommentEdit): Promise<CommentsEntity> {
-    const _comment = await this.commentsRepository.findOneBy({ id: idComment });
-    _comment.message = comment.message;
-    return this.commentsRepository.save(_comment);
-  }
-
-  async remove(idComment: number): Promise<CommentsEntity> {
     const _comment = await this.commentsRepository.findOne({
       where: { id: idComment },
-      relations: ['news'],
+      relations: ['news', 'user'],
+    });
+    _comment.message = comment.message;
+    const _updatedComment = await this.commentsRepository.save(_comment);
+    this.eventEmitter.emit(EventsComment.edit, {
+      commentId: idComment,
+      newsId: _comment.news.id,
+      comment: _updatedComment,
+    });
+    return _updatedComment;
+  }
+
+  async remove(idComment: number, userId: number): Promise<CommentsEntity> {
+    const _comment = await this.commentsRepository.findOne({
+      where: { id: idComment },
+      relations: ['news', 'user'],
     });
     if (!_comment) {
       throw new HttpException(
@@ -91,8 +104,21 @@ export class CommentsService {
         HttpStatus.NOT_FOUND,
       );
     }
+    const _user = await this.usersService.findById(userId);
+    if (
+      _user.id !== _comment.user.id &&
+      !checkPermission(Modules.editComment, _user.roles)
+    ) {
+      throw new HttpException(
+        {
+          status: HttpStatus.FORBIDDEN,
+          error: 'Недостаточно прав для удаления',
+        },
+        HttpStatus.FORBIDDEN,
+      );
+    }
     const comment = await this.commentsRepository.remove(_comment);
-    this.eventEmitter.emit('comment.remove', {
+    this.eventEmitter.emit(EventsComment.remove, {
       commentId: idComment,
       newsId: _comment.news.id,
     });

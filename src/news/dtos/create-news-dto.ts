@@ -9,9 +9,6 @@ export class CreateNewsDto {
   @IsString()
   description: string;
 
-  @IsNotEmpty()
-  userId: string;
-
   @ValidateIf((o) => o.cover !== undefined)
   cover: string;
 }
