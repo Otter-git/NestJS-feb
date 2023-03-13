@@ -1,8 +1,8 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Role } from 'src/auth/role/role.enum';
-import { checkPermission, Modules } from 'src/auth/role/utils/check-permission';
-import { hash } from 'src/utils/crypto';
+import { Role } from '../auth/role/role.enum';
+import { checkPermission, Modules } from '../auth/role/utils/check-permission';
+import { hash } from '../utils/crypto';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dtos/create-user-dto';
 import { EditUserDto } from './dtos/edit-user-dto';

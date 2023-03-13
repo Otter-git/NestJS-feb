@@ -10,7 +10,7 @@ export class MailService {
     console.log('Отправляется письмо установки');
     return this.mailerService
       .sendMail({
-        to: 'otterjs.gb@gmail.com',
+        to: '***',
         subject: 'Первое тестовое письмо',
         template: './test',
       })

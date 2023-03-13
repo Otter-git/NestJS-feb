@@ -4,7 +4,7 @@ import { CommentsController } from './comments.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CommentsEntity } from './comments.entity';
 import { NewsModule } from '../news.module';
-import { UsersModule } from 'src/users/users.module';
+import { UsersModule } from '../../users/users.module';
 import { SocketCommentsGateway } from './socket-comments.gateway';
 import { AuthModule } from '../../auth/auth.module';
 

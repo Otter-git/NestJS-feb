@@ -42,15 +42,31 @@ export class NewsEntity {
   @Column('text', { nullable: true })
   cover: string;
 
+  @ApiProperty({
+    type: () => UsersEntity,
+    description: 'Данные пользователя',
+  })
   @ManyToOne(() => UsersEntity, (user) => user.news)
   user: UsersEntity;
 
+  @ApiProperty({
+    type: () => CommentsEntity,
+    description: 'Данные комментариев',
+  })
   @OneToMany(() => CommentsEntity, (comments) => comments.news)
   comments: CommentsEntity[];
 
+  @ApiProperty({
+    example: '2023-03-09T14:28:40.797Z',
+    description: 'Дата создания',
+  })
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
 
+  @ApiProperty({
+    example: '2023-03-09T14:28:40.797Z',
+    description: 'Дата последнего изменения',
+  })
   @UpdateDateColumn({ type: 'timestamp' })
   updatedAt: Date;
 }
